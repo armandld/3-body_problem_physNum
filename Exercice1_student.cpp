@@ -56,7 +56,7 @@ double dist_s_l;     // Distance satellite-Lune
     // Ecriture tous les [sampling] pas de temps, sauf si write est vrai
     if((!write && last>=sampling) || (write && last!=1))
     {
-      *outputFile << t << " " << y[0] << " " << y[1] << " " \
+      *outputFile << t << " " << y[0] << " " << y[1] << " "
       << y[2] << " " << y[3] << " " << Energy << " "<< endl; // write output on file
       last = 1;
     }
@@ -70,16 +70,16 @@ double dist_s_l;     // Distance satellite-Lune
     {
 
 		
-		f[0] = y[2]; // vitesse en x du satellite
-		f[1] = y[3]; // vitesse en y du satellite
+		f[0] = f[2]; // vitesse en x du satellite
+		f[1] = f[3]; // vitesse en y du satellite
 		
-		f[2] = pow(Om, 2) * y[0] + 2 * Om * y[3] 
-       - G_grav * mt / pow(dist_s_t,2) * y[0] / sqrt(pow(y[0], 2) + pow(y[1], 2)) 
-       - G_grav * ml / pow(dist_s_l,2) * y[0] / sqrt(pow(y[0], 2) + pow(y[1], 2));
+		f[2] = pow(Om, 2) * f[0] + 2 * Om * f[3] 
+       - G_grav * mt / pow(dist_s_t,2) * f[0] / sqrt(pow(f[0], 2) + pow(f[1], 2)) 
+       - G_grav * ml / pow(dist_s_l,2) * f[0] / sqrt(pow(f[0], 2) + pow(f[1], 2));
 
-		f[3] = pow(Om, 2) * y[1] - 2 * Om * y[2] 
-       - G_grav * mt / pow(dist_s_t, 2) * y[1] / sqrt(pow(y[0], 2) + pow(y[1], 2)) 
-       - G_grav * ml / pow(dist_s_l, 2) * y[1] / sqrt(pow(y[0], 2) + pow(y[1], 2));
+		f[3] = pow(Om, 2) * f[1] - 2 * Om * f[2] 
+       - G_grav * mt / pow(dist_s_t, 2) * f[1] / sqrt(pow(f[0], 2) + pow(f[1], 2)) 
+       - G_grav * ml / pow(dist_s_l, 2) * f[1] / sqrt(pow(f[0], 2) + pow(f[1], 2));
 
 
     }
@@ -102,18 +102,19 @@ double dist_s_l;     // Distance satellite-Lune
       // et alpha=0.5 à Euler semi-implicite
       if(alpha >= 0. && alpha <= 1.0){
         t += dt;                 //mise à jour du temps 
-        valarray<double> yold_copie=yold; //copie de yold
+        valarray<double> yold_copie=valarray<double>(yold); //copie de yold
         compute_f(yold); 				  //yold vaut maintenant sa dérivée
         
         while(error>tol && iteration<=maxit)
         {
-			valarray<double> y_copie=y; //copie de y
+			valarray<double> y_copie=valarray<double>(y); //copie de y
 			compute_f(y);				//y vaut maintenant sa dérivée
             y = yold_copie + (alpha * yold + (1-alpha) * y) * dt;
-            
-            error = abs((y - yold_copie - (alpha * yold + (1 - alpha)) * y_copie ) * dt).max();
-            
-            iteration += 1;
+            valarray<double> y_copie_bis=valarray<double>(y);
+            compute_f(y);
+            error = abs((y_copie_bis - yold_copie - (alpha * yold + (1 - alpha)) * y ) * dt).max();
+            y = y_copie_bis;
+            ++iteration;
 		}	
         if(iteration>=maxit){
           cout << "WARNING: maximum number of iterations reached, error: " << error << endl;
@@ -169,11 +170,11 @@ public:
       Om = sqrt(G_grav*mt/(xl*dist*dist));
       xt = -ml*dist/(mt+ml);
       xl = mt*dist/(mt+ml); 
-      y0[2] = (xt*sqrt(ml)+xl*sqrt(mt))/(sqrt(mt)+sqrt(ml));
+      y0[0] = (xt*sqrt(ml)+xl*sqrt(mt))/(sqrt(mt)+sqrt(ml));
       
 
       t = 0.e0; // initialiser le temps
-      y = y0;   // initialiser le position 
+      y = y0;   // initialiser la position 
       last = 0; // initialise le parametre d'ecriture
 
       printOut(true); // ecrire la condition initiale
