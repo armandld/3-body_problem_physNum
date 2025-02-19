@@ -117,7 +117,7 @@ double dist_s_l;     // Distance satellite-Lune
             valarray<double> f_y_new=valarray<double>(y);
             compute_f(f_y_new);
             
-            error = abs((y - yold - (alpha * f_yold + (1 - alpha)) * f_y_new ) * dt).max();
+            error = abs(y - yold - (alpha * f_yold + (1 - alpha) * f_y_new ) * dt).max();
             
             ++iteration;
 		}	
