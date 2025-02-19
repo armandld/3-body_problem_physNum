@@ -92,6 +92,7 @@ double dist_s_l;     // Distance satellite-Lune
       valarray<double> f =valarray<double>(0.e0,4); 
       valarray<double> yold=valarray<double>(y);
       valarray<double> y_control=valarray<double>(y);
+      valarray<double> y_previous=valarray<double>(y);
       valarray<double> delta_y_EE=valarray<double>(y);
 
 	  dist_s_l = sqrt(pow(y[2]-xl,2)+pow(y[3],2));
