@@ -68,7 +68,7 @@ double dist_s_l;     // Distance satellite-Lune
 
     void compute_f(valarray<double>& f) //  TODO: Calcule le tableau de fonctions f(y)
     {
-
+		double f0_copie = f[0]; //copie de f[0]
 		double f2_copie = f[2]; //copie de f[2]
 		double f3_copie = f[3]; //copie de f[3]
 		
@@ -79,7 +79,7 @@ double dist_s_l;     // Distance satellite-Lune
        - G_grav * mt / pow(dist_s_t,2) * f2_copie / sqrt(pow(f2_copie, 2) + pow(f3_copie, 2)) 
        - G_grav * ml / pow(dist_s_l,2) * f2_copie / sqrt(pow(f2_copie, 2) + pow(f3_copie, 2));
 
-		f[1] = pow(Om, 2) * f[1] - 2 * Om * f[0] 
+		f[1] = pow(Om, 2) * f3_copie - 2 * Om * f0_copie
        - G_grav * mt / pow(dist_s_t, 2) * f3_copie / sqrt(pow(f2_copie, 2) + pow(f3_copie, 2)) 
        - G_grav * ml / pow(dist_s_l, 2) * f3_copie / sqrt(pow(f2_copie, 2) + pow(f3_copie, 2));
 	
@@ -118,7 +118,6 @@ double dist_s_l;     // Distance satellite-Lune
             compute_f(f_y_new);
             
             error = abs((y - yold - (alpha * f_yold + (1 - alpha)) * f_y_new ) * dt).max();
-            
             
             ++iteration;
 		}	
@@ -182,7 +181,8 @@ public:
       t = 0.e0; // initialiser le temps
       y = y0;   // initialiser la position 
       last = 0; // initialise le parametre d'ecriture
-
+	cout<<xl;
+	cout<<xt;
       printOut(true); // ecrire la condition initiale
 
       for(unsigned int i(0); i<nsteps; ++i) // boucle sur les pas de temps
