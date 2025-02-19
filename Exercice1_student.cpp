@@ -51,12 +51,12 @@ double dist_s_l;     // Distance satellite-Lune
   void printOut(bool write)
   {
   // TODO calculer l'energie mecanique
-    double Energy =  1/2*(y[2]*y[2]+y[3]*y[3])+G_grav*mt/dist_s_t+G_grav*ml/dist_s_l;
+    double Energy =  1/2*(y[0]*y[0]+y[1]*y[1])+G_grav*mt/dist_s_t+G_grav*ml/dist_s_l;
 
     // Ecriture tous les [sampling] pas de temps, sauf si write est vrai
     if((!write && last>=sampling) || (write && last!=1))
     {
-      *outputFile << t << " " << y[0] << " " << y[1] << " "
+      *outputFile << t << " " << y[0] << " " << y[1] << " " \
       << y[2] << " " << y[3] << " " << Energy << " "<< endl; // write output on file
       last = 1;
     }
@@ -70,16 +70,16 @@ double dist_s_l;     // Distance satellite-Lune
     {
 
 		
-		f[0] = f[2]; // vitesse en x du satellite
-		f[1] = f[3]; // vitesse en y du satellite
+		f[2] = f[0]; // vitesse en x du satellite
+		f[3] = f[1]; // vitesse en y du satellite
 		
-		f[2] = pow(Om, 2) * f[0] + 2 * Om * f[3] 
-       - G_grav * mt / pow(dist_s_t,2) * f[0] / sqrt(pow(f[0], 2) + pow(f[1], 2)) 
-       - G_grav * ml / pow(dist_s_l,2) * f[0] / sqrt(pow(f[0], 2) + pow(f[1], 2));
+		f[0] = pow(Om, 2) * f[2] + 2 * Om * f[1] 
+       - G_grav * mt / pow(dist_s_t,2) * f[2] / sqrt(pow(f[2], 2) + pow(f[3], 2)) 
+       - G_grav * ml / pow(dist_s_l,2) * f[2] / sqrt(pow(f[2], 2) + pow(f[3], 2));
 
-		f[3] = pow(Om, 2) * f[1] - 2 * Om * f[2] 
-       - G_grav * mt / pow(dist_s_t, 2) * f[1] / sqrt(pow(f[0], 2) + pow(f[1], 2)) 
-       - G_grav * ml / pow(dist_s_l, 2) * f[1] / sqrt(pow(f[0], 2) + pow(f[1], 2));
+		f[3] = pow(Om, 2) * f[1] - 2 * Om * f[0] 
+       - G_grav * mt / pow(dist_s_t, 2) * f[3] / sqrt(pow(f[2], 2) + pow(f[3], 2)) 
+       - G_grav * ml / pow(dist_s_l, 2) * f[3] / sqrt(pow(f[2], 2) + pow(f[3], 2));
 
 
     }
@@ -94,8 +94,8 @@ double dist_s_l;     // Distance satellite-Lune
       valarray<double> y_control=valarray<double>(y);
       valarray<double> delta_y_EE=valarray<double>(y);
 
-	  dist_s_l = sqrt(pow(y[0]-xl,2)+pow(y[1],2));
-	  dist_s_t = sqrt(pow(y[0]-xt,2)+pow(y[1],2));
+	  dist_s_l = sqrt(pow(y[2]-xl,2)+pow(y[3],2));
+	  dist_s_t = sqrt(pow(y[2]-xt,2)+pow(y[3],2));
 
       //TODO : écrire un algorithme valide pour chaque alpha dans [0,1]
       // tel que alpha=1 correspond à Euler explicite et alpha=0 à Euler implicite 
@@ -170,7 +170,7 @@ public:
       Om = sqrt(G_grav*mt/(xl*dist*dist));
       xt = -ml*dist/(mt+ml);
       xl = mt*dist/(mt+ml); 
-      y0[0] = (xt*sqrt(ml)+xl*sqrt(mt))/(sqrt(mt)+sqrt(ml));
+      y0[2] = (xt*sqrt(ml)+xl*sqrt(mt))/(sqrt(mt)+sqrt(ml));
       
 
       t = 0.e0; // initialiser le temps
