@@ -181,8 +181,7 @@ public:
       t = 0.e0; // initialiser le temps
       y = y0;   // initialiser la position 
       last = 0; // initialise le parametre d'ecriture
-	cout<<xl;
-	cout<<xt;
+
       printOut(true); // ecrire la condition initiale
 
       for(unsigned int i(0); i<nsteps; ++i) // boucle sur les pas de temps
