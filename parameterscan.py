@@ -13,7 +13,7 @@ os.chdir(repertoire)
 input_filename = 'configuration.in.example'  # Name of the input file
 
 
-nsteps = np.array([4000, 6000, 10000, 14e3, 20e3]) # TODO change
+nsteps = 4000
 nsimul = len(nsteps)  # Number of simulations to perform
 
 tfin = 259200  # TODO: Verify that the value of tfin is EXACTLY the same as in the input file
@@ -49,7 +49,7 @@ for i in range(nsimul):  # Iterate through the results of all simulations
     En = data[-1, 5]
     convergence_list.append(xx)
     # TODO compute the error for each simulation
-    error[i] =  0 
+    error[i] =  xx-x0-(alpha*f(y0,t)+(1-alpha)*f(yy,t+dt))*dt
 
 lw = 1.5
 fs = 16
