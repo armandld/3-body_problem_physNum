@@ -6,17 +6,23 @@ import os
 
 # Parameters
 # TODO adapt to what you need (folder path executable input filename)
-executable = 'exe.exe'  # Name of the executable (NB: .exe extension is required on Windows)
+executable = 'Exo1.exe'  # Name of the executable (NB: .exe extension is required on Windows)
 repertoire = r"C:/Users/Administrator/physnum/2025/EX1/SOLUTION/"
 os.chdir(repertoire)
 
 input_filename = 'configuration.in.example'  # Name of the input file
 
 
-nsteps = 4000
+nsteps = [4000]
 nsimul = len(nsteps)  # Number of simulations to perform
 
 tfin = 259200  # TODO: Verify that the value of tfin is EXACTLY the same as in the input file
+
+config_tfin = configFile.get('tfin', tfin)  # Récupère tfin du fichier de configuration, ou utilise la valeur par défaut
+
+if tfin != config_tfin:
+    print("Erreur : Les valeurs de tfin dans le code et le fichier de configuration sont différentes !")
+    sys.exit(1)
 
 dt = tfin / nsteps
 
@@ -49,7 +55,10 @@ for i in range(nsimul):  # Iterate through the results of all simulations
     En = data[-1, 5]
     convergence_list.append(xx)
     # TODO compute the error for each simulation
-    error[i] =  xx-x0-(alpha*f(y0,t)+(1-alpha)*f(yy,t+dt))*dt
+    
+    y0=data[0,4]
+    
+    error[i] =  np.abs(yy-y0)
 
 lw = 1.5
 fs = 16
