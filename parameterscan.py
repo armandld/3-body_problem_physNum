@@ -6,8 +6,13 @@ import os
 
 # Parameters
 # TODO adapt to what you need (folder path executable input filename)
+<<<<<<< HEAD
 executable = 'Exercice1_student'  # Name of the executable (NB: .exe extension is required on Windows)
 repertoire = r"/Users/Sayu/Desktop/3-body_problem_physNum/"
+=======
+executable = 'Exercice1.exe'  # Name of the executable (NB: .exe extension is required on Windows)
+repertoire = r"C:/Users/Administrator/physnum/2025/EX1/SOLUTION/"
+>>>>>>> 885d9b1f3e28ce104bcee4a8ba15ecb4d59d56e9
 os.chdir(repertoire)
 
 input_filename = 'configuration.in.example'  # Name of the input file
