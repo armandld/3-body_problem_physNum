@@ -93,7 +93,7 @@ double dist_s_l;     // Distance satellite-Lune
       valarray<double> f =valarray<double>(0.e0,4); 
       valarray<double> yold=valarray<double>(y);
       valarray<double> y_control=valarray<double>(y);
-      valarray<double> y_previous=valarray<double>(y);
+      valarray<double> f_y_previous=valarray<double>(y);
       valarray<double> delta_y_EE=valarray<double>(y);
 
 	  dist_s_l = sqrt(pow(y[2]-xl,2)+pow(y[3],2));
@@ -104,20 +104,21 @@ double dist_s_l;     // Distance satellite-Lune
       // et alpha=0.5 à Euler semi-implicite
       if(alpha >= 0. && alpha <= 1.0){
         t += dt;                 //mise à jour du temps 
-        valarray<double> f_yold=yold; 
-        compute_f(f_yold); //f(yold)
+        
+        compute_f(delta_y_EE);
+        delta_y_EE *= alpha * dt;
         
         while(error>tol && iteration<=maxit)
         {
-			valarray<double> f_y=valarray<double>(y);
-			compute_f(f_y);//f(y)
+			valarray<double> f_y_previous=valarray<double>(y);
+			compute_f(f_y_previous);//f(y)
 
-            y = yold + (alpha * f_yold + (1-alpha) * f_y) * dt;
+            y = yold + delta_y_EE + (1-alpha) * f_y_previous * dt;
             
-            valarray<double> f_y_new=valarray<double>(y);
-            compute_f(f_y_new);
+            y_control=y;
+            compute_f(y_control);
             
-            error = abs(y - yold - (alpha * f_yold + (1 - alpha) * f_y_new ) * dt).max();
+            error = abs(y - yold - delta_y_EE - (1 - alpha) * y_control * dt).max();
             
             ++iteration;
 		}	
@@ -129,7 +130,7 @@ double dist_s_l;     // Distance satellite-Lune
       {
         cerr << "alpha not valid" << endl;
       }
-      cout << iteration << endl;
+      cout << iteration<< endl;
   
     }
 
