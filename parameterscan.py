@@ -13,10 +13,12 @@ os.chdir(repertoire)
 input_filename = 'configuration.in.example'  # Name of the input file
 
 
-nsteps = [4000]
+nsteps = np.array([4000, 6000, 10000, 14e3, 20e3])
 nsimul = len(nsteps)  # Number of simulations to perform
 
 tfin = 259200  # TODO: Verify that the value of tfin is EXACTLY the same as in the input file
+
+dt = tfin / nsteps
 
 paramstr = 'nsteps'  # Parameter name to scan
 param = nsteps  # Parameter values to scan
