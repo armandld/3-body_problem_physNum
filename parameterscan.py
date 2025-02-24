@@ -6,8 +6,8 @@ import os
 
 # Parameters
 # TODO adapt to what you need (folder path executable input filename)
-executable = 'Exo1.exe'  # Name of the executable (NB: .exe extension is required on Windows)
-repertoire = r"C:/Users/Administrator/physnum/2025/EX1/SOLUTION/"
+executable = 'Exercice1_student'  # Name of the executable (NB: .exe extension is required on Windows)
+repertoire = r"/Users/Sayu/Desktop/3-body_problem_physNum/"
 os.chdir(repertoire)
 
 input_filename = 'configuration.in.example'  # Name of the input file
@@ -18,15 +18,6 @@ nsimul = len(nsteps)  # Number of simulations to perform
 
 tfin = 259200  # TODO: Verify that the value of tfin is EXACTLY the same as in the input file
 
-config_tfin = configFile.get('tfin', tfin)  # Récupère tfin du fichier de configuration, ou utilise la valeur par défaut
-
-if tfin != config_tfin:
-    print("Erreur : Les valeurs de tfin dans le code et le fichier de configuration sont différentes !")
-    sys.exit(1)
-
-dt = tfin / nsteps
-
-
 paramstr = 'nsteps'  # Parameter name to scan
 param = nsteps  # Parameter values to scan
 
@@ -36,8 +27,8 @@ convergence_list = []
 for i in range(nsimul):
     output_file = f"{paramstr}={param[i]}.out"
     outputs.append(output_file)
-    cmd = f"{repertoire}{executable} {input_filename} {paramstr}={param[i]:.15g} output={output_file}"
-    cmd = f"{executable} {input_filename} {paramstr}={param[i]:.15g} output={output_file}"
+    cmd = f"./{repertoire}{executable} {input_filename} {paramstr}={param[i]:.15g} output={output_file}"
+    cmd = f"./{executable} {input_filename} {paramstr}={param[i]:.15g} output={output_file}"
     print(cmd)
     subprocess.run(cmd, shell=True)
     print('Done.')
