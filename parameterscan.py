@@ -6,7 +6,7 @@ import os
 
 # Parameters
 # TODO adapt to what you need (folder path executable input filename)
-executable = 'Exo1.exe'  # Name of the executable (NB: .exe extension is required on Windows)
+executable = 'Exercice1.exe'  # Name of the executable (NB: .exe extension is required on Windows)
 repertoire = r"C:/Users/Administrator/physnum/2025/EX1/SOLUTION/"
 os.chdir(repertoire)
 
