@@ -47,11 +47,12 @@ double dist_s_l;     // Distance satellite-Lune
   /* Calculer et ecrire les diagnostics dans un fichier
      inputs:
      write: (bool) ecriture de tous les sampling si faux
-  */  
+  */
   void printOut(bool write)
   {
   // TODO calculer l'energie mecanique
-    double Energy =  1/2*(y[0]*y[0]+y[1]*y[1])+G_grav*mt/dist_s_t+G_grav*ml/dist_s_l;
+    double Energy =  1/2*(y[0]*y[0]+y[1]*y[1])
+					+G_grav*mt/dist_s_t+G_grav*ml/dist_s_l -1/2*Om*Om*(y[2]*y[2]+y[3]*y[3]);
 
     // Ecriture tous les [sampling] pas de temps, sauf si write est vrai
     if((!write && last>=sampling) || (write && last!=1))
@@ -76,12 +77,12 @@ double dist_s_l;     // Distance satellite-Lune
 		f[3] = f[1]; // vitesse en y du satellite
 		
 		f[0] = pow(Om, 2) * f2_copie + 2 * Om * f[1] 
-       - G_grav * mt / pow(dist_s_t,2) * f2_copie / sqrt(pow(f2_copie, 2) + pow(f3_copie, 2)) 
-       - G_grav * ml / pow(dist_s_l,2) * f2_copie / sqrt(pow(f2_copie, 2) + pow(f3_copie, 2));
+       - G_grav * mt  * (f2_copie -xt) / pow(dist_s_t,3)
+       - G_grav * ml * (f2_copie - xl) / pow(dist_s_l,3) ;
 
 		f[1] = pow(Om, 2) * f3_copie - 2 * Om * f0_copie
-       - G_grav * mt / pow(dist_s_t, 2) * f3_copie / sqrt(pow(f2_copie, 2) + pow(f3_copie, 2)) 
-       - G_grav * ml / pow(dist_s_l, 2) * f3_copie / sqrt(pow(f2_copie, 2) + pow(f3_copie, 2));
+       - G_grav * mt * f3_copie / pow(dist_s_t, 3) 
+       - G_grav * ml * f3_copie / pow(dist_s_l, 3);
 	
     }
 
@@ -110,7 +111,7 @@ double dist_s_l;     // Distance satellite-Lune
         
         while(error>tol && iteration<=maxit)
         {
-			valarray<double> f_y_previous=valarray<double>(y);
+			f_y_previous= y;
 			compute_f(f_y_previous);//f(y)
 
             y = yold + delta_y_EE + (1-alpha) * f_y_previous * dt;
@@ -155,7 +156,6 @@ public:
       alpha    = configFile.get<double>("alpha", alpha);
       // TODO: calculer le time step
       dt       = tfin/nsteps;
-
       
       // Ouverture du fichier de sortie
       outputFile = new ofstream(configFile.get<string>("output","output.out").c_str()); 
