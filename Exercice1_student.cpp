@@ -97,7 +97,6 @@ double dist_s_l;     // Distance satellite-Lune
       valarray<double> f =valarray<double>(0.e0,4); 
       valarray<double> yold=valarray<double>(y);
       valarray<double> y_control=valarray<double>(y);
-      valarray<double> f_y_previous=valarray<double>(y);
       valarray<double> delta_y_EE=valarray<double>(y);
 
 	  dist_s_l = sqrt(pow(y[2]-xl,2)+pow(y[3],2));
@@ -120,7 +119,7 @@ double dist_s_l;     // Distance satellite-Lune
             y = yold + delta_y_EE + (1-alpha) * f * dt;
             
             y_control=y;
-            compute_f(y_control);
+            compute_f(y_control); // copie de f(y) après modification de y
             
             error = abs(y - yold - delta_y_EE - (1 - alpha) * y_control * dt).max();
             
@@ -176,10 +175,12 @@ public:
     void run()
     {
       // TODO : initialiser la position de la Terre et de la Lune, ainsi que la position de X' du satellite et Omega
-      xl = mt * dist / (mt+ml);
-      xt = - ml * dist /(mt+ml);
-      Om = sqrt(G_grav*mt/(xl*dist*dist));      
-      y0[2] = (xt*sqrt(ml)+xl*sqrt(mt))/(sqrt(mt)+sqrt(ml));
+      
+      // Valeurs calculées à partir des résulats analytiques
+      xl = mt * dist / (mt + ml);
+      xt = - ml * dist / (mt + ml);
+      Om = sqrt(G_grav * mt / (xl * dist * dist));      
+      y0[2] = (xt * sqrt(ml) + xl * sqrt(mt)) / (sqrt(mt) + sqrt(ml));
       
 
       t = 0.e0; // initialiser le temps
