@@ -35,8 +35,8 @@ double xl;           // Position de la Lune
 double dist_s_t;     // Distance satellite-Terre
 double dist_s_l;     // Distance satellite-Lune
 
-  valarray<double> y0 = std::valarray<double>(0.e0, 4); // Correctly initialized
-  valarray<double> y  = std::valarray<double>(0.e0, 4); // Correctly initialized
+  valarray<double> y0 = std::valarray<double>(0.e0, 6); // Correctly initialized
+  valarray<double> y  = std::valarray<double>(0.e0, 6); // Correctly initialized
 
   double t,dt;  // Temps courant pas de temps
 
@@ -51,14 +51,15 @@ double dist_s_l;     // Distance satellite-Lune
   void printOut(bool write)
   {
   // TODO calculer l'energie mecanique
-    double Energy =  1/2*(y[0]*y[0]+y[1]*y[1])
-					+G_grav*mt/dist_s_t+G_grav*ml/dist_s_l -1/2*Om*Om*(y[2]*y[2]+y[3]*y[3]);
+    double Energy =  1/2 * (y[0]*y[0] + y[1]*y[1]) // Énergie cinétique
+					+ G_grav * mt / dist_s_t + G_grav * ml / dist_s_l // Énergie potentielle gravitationnelle
+					- 1/2 * Om * Om * (y[2]*y[2] + y[3]*y[3]); // Énergie potentielle centrifuge
 
     // Ecriture tous les [sampling] pas de temps, sauf si write est vrai
     if((!write && last>=sampling) || (write && last!=1))
     {
       *outputFile << t << " " << y[0] << " " << y[1] << " " \
-      << y[2] << " " << y[3] << " " << Energy << " "<< endl; // write output on file
+      << y[2] << " " << y[3] << " " << Energy << " "<<y[4] << " "<< y[5]<<endl; // write output on file
       last = 1;
     }
     else
@@ -76,10 +77,12 @@ double dist_s_l;     // Distance satellite-Lune
 		f[2] = f[0]; // vitesse en x du satellite
 		f[3] = f[1]; // vitesse en y du satellite
 		
+		// Force selon la composante x'
 		f[0] = pow(Om, 2) * f2_copie + 2 * Om * f[1] 
        - G_grav * mt  * (f2_copie -xt) / pow(dist_s_t,3)
        - G_grav * ml * (f2_copie - xl) / pow(dist_s_l,3) ;
-
+       
+		// Force selon la composante y'
 		f[1] = pow(Om, 2) * f3_copie - 2 * Om * f0_copie
        - G_grav * mt * f3_copie / pow(dist_s_t, 3) 
        - G_grav * ml * f3_copie / pow(dist_s_l, 3);
@@ -91,10 +94,9 @@ double dist_s_l;     // Distance satellite-Lune
     {
       unsigned int iteration=0;
       double error=999e0;
-      valarray<double> f =valarray<double>(0.e0,4); 
+      valarray<double> f =valarray<double>(0.e0,6); 
       valarray<double> yold=valarray<double>(y);
       valarray<double> y_control=valarray<double>(y);
-      valarray<double> f_y_previous=valarray<double>(y);
       valarray<double> delta_y_EE=valarray<double>(y);
 
 	  dist_s_l = sqrt(pow(y[2]-xl,2)+pow(y[3],2));
@@ -111,11 +113,12 @@ double dist_s_l;     // Distance satellite-Lune
         
         while(error>tol && iteration<=maxit)
         {
-			f_y_previous= y;
-			compute_f(f_y_previous);//f(y)
+			f = y;
+			compute_f(f);// copie de f(y) avant de modifier y
 
-            y = yold + delta_y_EE + (1-alpha) * f_y_previous * dt;
-            
+            y = yold + delta_y_EE + (1-alpha) * f * dt;
+            y[4] = dist_s_l;
+            y[5] = dist_s_t;
             y_control=y;
             compute_f(y_control);
             
@@ -173,11 +176,13 @@ public:
     void run()
     {
       // TODO : initialiser la position de la Terre et de la Lune, ainsi que la position de X' du satellite et Omega
-      xl = mt*dist/(mt+ml);
-      xt = -ml*dist/(mt+ml);
+      xl = mt * dist / (mt+ml);
+      xt = - ml * dist /(mt+ml);
       Om = sqrt(G_grav*mt/(xl*dist*dist));      
       y0[2] = (xt*sqrt(ml)+xl*sqrt(mt))/(sqrt(mt)+sqrt(ml));
       
+      y0[4] = dist_s_l;
+      y0[5] = dist_s_t; 
 
       t = 0.e0; // initialiser le temps
       y = y0;   // initialiser la position 
