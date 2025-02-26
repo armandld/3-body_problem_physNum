@@ -49,7 +49,7 @@ for i in range(nsimul):  # Iterate through the results of all simulations
     convergence_list.append(xx)
     # TODO compute the error for each simulation
     
-    y0=data[0,6]
+    y0=data[0,4]
     
     error[i] =  np.abs(yy-y0)
 
@@ -85,22 +85,6 @@ plt.figure()
 plt.plot(dt**norder, convergence_list, 'k+-', linewidth=lw)
 plt.xlabel('\Delta t [s]', fontsize=fs)
 plt.ylabel('v_y [m/s]', fontsize=fs)
-plt.xticks(fontsize=fs)
-plt.yticks(fontsize=fs)
-plt.grid(True)
-
-plt.figure()
-plt.plot(t, data[:,5], 'r+-', linewidth=lw)
-plt.xlabel('\Delta t [s]', fontsize=fs)
-plt.ylabel('Energie mécanique [J]', fontsize=fs)
-plt.xticks(fontsize=fs)
-plt.yticks(fontsize=fs)
-plt.grid(True)
-
-plt.figure()
-plt.plot(t, data[:,6], 'r+-', linewidth=lw)
-plt.xlabel('\Delta t [s]', fontsize=fs)
-plt.ylabel('Energie mécanique [J]', fontsize=fs)
 plt.xticks(fontsize=fs)
 plt.yticks(fontsize=fs)
 plt.grid(True)

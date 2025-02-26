@@ -35,8 +35,8 @@ double xl;           // Position de la Lune
 double dist_s_t;     // Distance satellite-Terre
 double dist_s_l;     // Distance satellite-Lune
 
-  valarray<double> y0 = std::valarray<double>(0.e0, 6); // Correctly initialized
-  valarray<double> y  = std::valarray<double>(0.e0, 6); // Correctly initialized
+  valarray<double> y0 = std::valarray<double>(0.e0, 4); // Correctly initialized
+  valarray<double> y  = std::valarray<double>(0.e0, 4); // Correctly initialized
 
   double t,dt;  // Temps courant pas de temps
 
@@ -59,7 +59,7 @@ double dist_s_l;     // Distance satellite-Lune
     if((!write && last>=sampling) || (write && last!=1))
     {
       *outputFile << t << " " << y[0] << " " << y[1] << " " \
-      << y[2] << " " << y[3] << " " << Energy << " "<<y[4] << " "<< y[5]<<endl; // write output on file
+      << y[2] << " " << y[3] << " " << Energy << " "<< endl; // write output on file
       last = 1;
     }
     else
@@ -94,9 +94,10 @@ double dist_s_l;     // Distance satellite-Lune
     {
       unsigned int iteration=0;
       double error=999e0;
-      valarray<double> f =valarray<double>(0.e0,6); 
+      valarray<double> f =valarray<double>(0.e0,4); 
       valarray<double> yold=valarray<double>(y);
       valarray<double> y_control=valarray<double>(y);
+      valarray<double> f_y_previous=valarray<double>(y);
       valarray<double> delta_y_EE=valarray<double>(y);
 
 	  dist_s_l = sqrt(pow(y[2]-xl,2)+pow(y[3],2));
@@ -117,8 +118,7 @@ double dist_s_l;     // Distance satellite-Lune
 			compute_f(f);// copie de f(y) avant de modifier y
 
             y = yold + delta_y_EE + (1-alpha) * f * dt;
-            y[4] = dist_s_l;
-            y[5] = dist_s_t;
+            
             y_control=y;
             compute_f(y_control);
             
@@ -181,8 +181,6 @@ public:
       Om = sqrt(G_grav*mt/(xl*dist*dist));      
       y0[2] = (xt*sqrt(ml)+xl*sqrt(mt))/(sqrt(mt)+sqrt(ml));
       
-      y0[4] = dist_s_l;
-      y0[5] = dist_s_t; 
 
       t = 0.e0; // initialiser le temps
       y = y0;   // initialiser la position 
