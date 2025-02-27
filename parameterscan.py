@@ -51,7 +51,7 @@ for i in range(nsimul):  # Iterate through the results of all simulations
     
     y0=data[0,4]
     
-    error[i] =  np.abs(yy-y0)
+    error[i] =  np.sqrt((yy-y0)**2+(xx-x0)**2) # quoi prendre ?? 
 
 lw = 1.5
 fs = 16
