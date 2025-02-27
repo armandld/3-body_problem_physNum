@@ -48,7 +48,8 @@ for i in range(nsimul):  # Iterate through the results of all simulations
     En = data[-1, 5]
     convergence_list.append(xx)
     # TODO compute the error for each simulation
-    
+
+    x0=data[0,3]
     y0=data[0,4]
     
     error[i] =  np.sqrt((yy-y0)**2+(xx-x0)**2) # quoi prendre ?? 
