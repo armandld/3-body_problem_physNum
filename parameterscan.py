@@ -47,24 +47,41 @@ for i in range(nsimul):  # Iterate through the results of all simulations
     En = data[-1, 5]
     convergence_list.append(xx)
     # TODO compute the error for each simulation
-    
+
+    x0=data[0,3]
     y0=data[0,4]
-    
-    error[i] =  np.abs(yy-2*1e7)
+
+    error[i] =  np.abs(yy)
+#    error[i] =  np.sqrt((yy-y0)**2+(xx-x0)**2) # quoi prendre ?? 
 
 lw = 1.5
 fs = 16
 
-fig, ax = plt.subplots(constrained_layout=True)
-ax.plot(data[:, 3], data[:, 4])
-ax.set_xlabel('x [m]', fontsize=fs)
-ax.set_ylabel('y [m]', fontsize=fs)
+#fig, ax = plt.subplots(constrained_layout=True)
+#ax.plot(data[:, 3], data[:, 4])
+#ax.set_xlabel('x [m]', fontsize=fs)
+#ax.set_ylabel('y [m]', fontsize=fs)
 
 
 
 # uncomment the following if you want debug
 #import pdb
 #pbd.set_trace()
+
+plt.figure()
+plt.loglog(dt, error, 'r+-', linewidth=lw)
+plt.xlabel('dt [s]', fontsize=fs)
+plt.ylabel('final position error [m]', fontsize=fs)
+plt.xticks(fontsize=fs)
+plt.yticks(fontsize=fs)
+plt.grid(True)
+
+a = (error[-1]-error[-2])/(dt[-1]-dt[-2])
+
+b = error[-1] - a*dt[-1]
+
+error -= b
+
 plt.figure()
 plt.loglog(dt, error, 'r+-', linewidth=lw)
 plt.xlabel('dt [s]', fontsize=fs)
@@ -80,20 +97,32 @@ en fonction de (Delta t)^norder, ou norder est un entier.
 """
 norder = 1  # Modify if needed
 
+a = (convergence_list[-1]-convergence_list[-2])/((dt[-1]**norder)-(dt[-2]**norder))
+
+b = convergence_list[-1] - a*(dt[-1]**norder)
+
 plt.figure()
 plt.plot(dt**norder, convergence_list, 'k+-', linewidth=lw)
 plt.xlabel('dt [s]', fontsize=fs)
-plt.ylabel('v_y [m/s]', fontsize=fs)
+plt.ylabel('xx [m]', fontsize=fs)
 plt.xticks(fontsize=fs)
 plt.yticks(fontsize=fs)
 plt.grid(True)
 
 plt.figure()
-plt.plot(t, data[:,5], 'k+-', linewidth=lw)
-plt.xlabel('t [s]', fontsize=fs)
-plt.ylabel('Énergie mécanique [J]', fontsize=fs)
+plt.loglog(dt**norder, convergence_list-b, 'r+-', linewidth=lw)
+plt.xlabel('dt [s]', fontsize=fs)
+plt.ylabel('final position error [m]', fontsize=fs)
 plt.xticks(fontsize=fs)
 plt.yticks(fontsize=fs)
 plt.grid(True)
+
+#plt.figure()
+#plt.plot(t, data[:,5], 'k+-', linewidth=lw)
+#plt.xlabel('t [s]', fontsize=fs)
+#plt.ylabel('Énergie mécanique [J]', fontsize=fs)
+#plt.xticks(fontsize=fs)
+#plt.yticks(fontsize=fs)
+#plt.grid(True)
 
 plt.show()
