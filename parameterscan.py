@@ -12,8 +12,7 @@ os.chdir(repertoire)
 
 input_filename = 'configuration.in.example'  # Name of the input file
 
-
-nsteps = np.array([4000, 6000, 10000, 14e3, 20e3])
+nsteps = np.array([4000, 6000, 10000, 14e3, 20e3, 40e3, 100e3,200e3,500e3,1000e3 ])
 nsimul = len(nsteps)  # Number of simulations to perform
 
 tfin = 259200  # TODO: Verify that the value of tfin is EXACTLY the same as in the input file
@@ -51,7 +50,7 @@ for i in range(nsimul):  # Iterate through the results of all simulations
     
     y0=data[0,4]
     
-    error[i] =  np.abs(yy-y0)
+    error[i] =  np.abs(yy-2*1e7)
 
 lw = 1.5
 fs = 16
@@ -68,7 +67,7 @@ ax.set_ylabel('y [m]', fontsize=fs)
 #pbd.set_trace()
 plt.figure()
 plt.loglog(dt, error, 'r+-', linewidth=lw)
-plt.xlabel('\Delta t [s]', fontsize=fs)
+plt.xlabel('dt [s]', fontsize=fs)
 plt.ylabel('final position error [m]', fontsize=fs)
 plt.xticks(fontsize=fs)
 plt.yticks(fontsize=fs)
@@ -83,8 +82,16 @@ norder = 1  # Modify if needed
 
 plt.figure()
 plt.plot(dt**norder, convergence_list, 'k+-', linewidth=lw)
-plt.xlabel('\Delta t [s]', fontsize=fs)
+plt.xlabel('dt [s]', fontsize=fs)
 plt.ylabel('v_y [m/s]', fontsize=fs)
+plt.xticks(fontsize=fs)
+plt.yticks(fontsize=fs)
+plt.grid(True)
+
+plt.figure()
+plt.plot(t, data[:,5], 'k+-', linewidth=lw)
+plt.xlabel('t [s]', fontsize=fs)
+plt.ylabel('Énergie mécanique [J]', fontsize=fs)
 plt.xticks(fontsize=fs)
 plt.yticks(fontsize=fs)
 plt.grid(True)
