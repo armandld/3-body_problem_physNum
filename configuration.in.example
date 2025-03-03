@@ -1,5 +1,5 @@
 tfin = 259200 !
-nsteps = 40000
+nsteps = 4000
 G_grav = 6.6743e-11
 mt = 5.972e24
 ml = 7.348e22
@@ -7,7 +7,7 @@ rt = 6378100 !metr
 rl = 1737100 ! metr
 dist = 385000000 ! metr
 tol = 1e-3
-alpha = 1
+alpha = 0.5
 maxit = 100
 output = output_SI.txt
 sampling = 1

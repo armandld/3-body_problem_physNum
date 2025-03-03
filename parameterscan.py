@@ -13,15 +13,15 @@ os.chdir(repertoire)
 input_filename = 'configuration.in.example'  # Name of the input file
 
 alpha = np.array([0,0.5,1])
-nsteps = np.array([4000, 6000, 10000, 14e3, 20e3])
-nsimul = len(alpha)  # Number of simulations to perform
+nsteps = np.array([4000, 6000, 8e3,10000, 14e3, 2e4, 3e4, 5e4, 7e4,1e5])
+nsimul = len(nsteps)  # Number of simulations to perform
 
 tfin = 259200  # TODO: Verify that the value of tfin is EXACTLY the same as in the input file
 
 dt = tfin / nsteps
 
 paramstr = 'alpha'  # Parameter name to scan
-param = alpha  # Parameter values to scan
+param = nsteps  # Parameter values to scan
 
 # Simulations
 outputs = []  # List to store output file names
@@ -37,13 +37,14 @@ for i in range(nsimul):
     print('Done.')
 
 error = np.zeros(nsimul)
-
+'''
 fig, ax = plt.subplots(constrained_layout=True)
 plt.grid(True, linestyle="--", alpha=0.3)
 fig2, ax2 = plt.subplots(constrained_layout=True)
 plt.grid(True, linestyle="--", alpha=0.3)
 fig3, ax3 = plt.subplots(constrained_layout=True)
 plt.grid(True, linestyle="--", alpha=0.3)
+'''
 for i in range(nsimul):  # Iterate through the results of all simulations
     data = np.loadtxt(outputs[i])  # Load the output file of the i-th simulation
     t = data[:, 0]
@@ -53,17 +54,13 @@ for i in range(nsimul):  # Iterate through the results of all simulations
     xx = data[-1, 3]
     yy = data[-1, 4]
     En = data[-1, 5]
-    convergence_list.append(xx)
+    convergence_list.append(En)
     # TODO compute the error for each simulation
+    error[i] =  np.abs(xx)
+lw = 1.5
+fs = 16
+convergence_list = np.array(convergence_list)
 
-    x0=data[0,3]
-    y0=data[0,4]
-
-    error[i] =  np.abs(yy)
-    lw = 1.5
-    fs = 16
-
-    
     ax.plot(data[:, 3], data[:, 4])
     ax2.plot(data[:, 3], data[:, 4])
     #fig3, ax3 = plt.subplots(constrained_layout=True)
@@ -99,32 +96,19 @@ ax2.set_aspect('equal')
 
 
 
-#    error[i] =  np.sqrt((yy-y0)**2+(xx-x0)**2) # quoi prendre ?? 
-
-# uncomment the following if you want debug
-#import pdb
-#pbd.set_trace()
-'''
-plt.figure()
-plt.loglog(dt, error, 'r+-', linewidth=lw)
-plt.xlabel('dt [s]', fontsize=fs)
-plt.ylabel('final position error [m]', fontsize=fs)
-plt.xticks(fontsize=fs)
-plt.yticks(fontsize=fs)
-plt.grid(True)
-
-
 
 a = (error[-1]-error[-2])/(dt[-1]-dt[-2])
 
 b = error[-1] - a*dt[-1]
 
 error -= b
-
+# uncomment the following if you want debug
+#import pdb
+#pbd.set_trace()
 plt.figure()
-plt.loglog(dt, -error, 'r+-', linewidth=lw)
-plt.xlabel('dt [s]', fontsize=fs)
-plt.ylabel('final position error [m]', fontsize=fs)
+plt.loglog(dt, error, 'r+-', linewidth=lw)
+plt.xlabel('\Delta t [s]', fontsize=fs)
+plt.ylabel('final position x error [m]', fontsize=fs)
 plt.xticks(fontsize=fs)
 plt.yticks(fontsize=fs)
 plt.grid(True)
@@ -134,37 +118,57 @@ Si on n'a pas la solution analytique: on représente la quantite voulue
 (ci-dessous v_y, modifier selon vos besoins)
 en fonction de (Delta t)^norder, ou norder est un entier.
 """
-norder = 1  # Modify if needed
 
-a = (convergence_list[-1]-convergence_list[-2])/((dt[-1]**norder)-(dt[-2]**norder))
+#### PARTIE 2
 
-b = convergence_list[-1] - a*(dt[-1]**norder)
+# Définition des paramètres
+executable = 'Exercice1_student'  # Nom de l'exécutable
+repertoire = r"/Users/Sayu/Desktop/3-body_problem_physNum/"
+os.chdir(repertoire)
+input_filename = 'configuration.in.example'  # Nom du fichier d'entrée
 
+alpha_values = np.array([0, 0.5, 1])  # Valeurs de alpha
+nsteps = np.array([2000,4000, 6000, 8000, 10000, 14000, 20000, 30000, 50000, 70000, 100000,200000])
+nsimul = len(nsteps)  # Nombre de simulations
+tfin = 259200  # Vérifie que tfin correspond à ton fichier d'entrée
+dt = tfin / nsteps  # Calcul du pas de temps
+
+# Dictionnaire pour stocker les énergies finales par alpha
+convergence_dict = {}
+for alpha in alpha_values:
+    outputs = []  # Liste des fichiers de sortie
+    convergence_list = []  # Liste des énergies mécaniques finales
+    
+    for i in range(nsimul):
+        output_file = f"alpha={alpha}_nsteps={nsteps[i]}.out"
+        outputs.append(output_file)
+        cmd = f"./{executable} {input_filename} alpha={alpha} nsteps={nsteps[i]:.15g} output={output_file}"
+        print(cmd)
+        subprocess.run(cmd, shell=True)
+        print('Done.')
+
+    # Lecture des résultats
+    for i in range(nsimul):
+        data = np.loadtxt(outputs[i])
+        E = data[-1,5]
+        En_min = np.nanmin(data[2:, 5])  # Ajout des parenthèses
+        En_max = np.nanmax(data[2:, 5])
+        dE = En_max - En_min
+        convergence_list.append(dE)
+
+    # Stocke les résultats
+    convergence_dict[alpha] = np.array(convergence_list)
+
+# --- Affichage des résultats ---
+lw = 1.5
+fs = 16
 plt.figure()
-plt.plot(dt**norder, convergence_list, 'k+-', linewidth=lw)
-plt.xlabel('dt [s]', fontsize=fs)
-plt.ylabel('xx [m]', fontsize=fs)
+
+for alpha in alpha_values:
+    plt.loglog(dt, np.abs(convergence_dict[alpha]),'+-',linewidth = lw)
+plt.xlabel(r'$\Delta t$ [s]', fontsize=fs)
+plt.ylabel('Erreur de l\' énergie mécanique [J]', fontsize=fs)
 plt.xticks(fontsize=fs)
 plt.yticks(fontsize=fs)
-plt.grid(True)
-
-plt.figure()
-plt.loglog(dt**norder, convergence_list-b, 'r+-', linewidth=lw)
-plt.xlabel('dt [s]', fontsize=fs)
-plt.ylabel('final position error [m]', fontsize=fs)
-plt.xticks(fontsize=fs)
-plt.yticks(fontsize=fs)
-plt.grid(True)
-
-#plt.figure()
-#plt.plot(t, data[:,5], 'k+-', linewidth=lw)
-#plt.xlabel('t [s]', fontsize=fs)
-#plt.ylabel('Énergie mécanique [J]', fontsize=fs)
-#plt.xticks(fontsize=fs)
-#plt.yticks(fontsize=fs)
-#plt.grid(True)
-
-
-'''
-print(nsteps)
+plt.grid(True, linestyle="--", alpha=0.3)
 plt.show()
