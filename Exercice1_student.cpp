@@ -51,9 +51,9 @@ double dist_s_l;     // Distance satellite-Lune
   void printOut(bool write)
   {
   // TODO calculer l'energie mecanique
-    double Energy =  1/2 * (y[0]*y[0] + y[1]*y[1]) // Énergie cinétique
-					+ G_grav * mt / dist_s_t + G_grav * ml / dist_s_l // Énergie potentielle gravitationnelle
-					- 1/2 * Om * Om * (y[2]*y[2] + y[3]*y[3]); // Énergie potentielle centrifuge
+    double Energy =  0.5 * (y[0]*y[0] + y[1]*y[1]) // Énergie cinétique
+					- G_grav * mt / dist_s_t - G_grav * ml / dist_s_l // Énergie potentielle gravitationnelle
+					- 0.5 * Om * Om * (y[2]*y[2] + y[3]*y[3]); // Énergie potentielle centrifuge
 
     // Ecriture tous les [sampling] pas de temps, sauf si write est vrai
     if((!write && last>=sampling) || (write && last!=1))
@@ -88,7 +88,9 @@ double dist_s_l;     // Distance satellite-Lune
        - G_grav * ml * f3_copie / pow(dist_s_l, 3);
 	
     }
-
+    
+	double dist_s(double x){ return sqrt(pow(y[2]-x,2)+pow(y[3],2));}
+	
     // New step method from EngineEuler
     void step()
     {
@@ -99,8 +101,9 @@ double dist_s_l;     // Distance satellite-Lune
       valarray<double> y_control=valarray<double>(y);
       valarray<double> delta_y_EE=valarray<double>(y);
 
-	  dist_s_l = sqrt(pow(y[2]-xl,2)+pow(y[3],2));
-	  dist_s_t = sqrt(pow(y[2]-xt,2)+pow(y[3],2));
+	  dist_s_l = dist_s(xl);
+	  dist_s_t = dist_s(xt);
+		
 
       //TODO : écrire un algorithme valide pour chaque alpha dans [0,1]
       // tel que alpha=1 correspond à Euler explicite et alpha=0 à Euler implicite 
@@ -113,6 +116,9 @@ double dist_s_l;     // Distance satellite-Lune
         
         while(error>tol && iteration<=maxit)
         {
+			dist_s_l = dist_s(xl);
+			dist_s_t = dist_s(xt);
+			
 			f = y;
 			compute_f(f);// copie de f(y) avant de modifier y
 
@@ -182,7 +188,6 @@ public:
       Om = sqrt(G_grav * mt / (xl * dist * dist));      
       y0[2] = (xt * sqrt(ml) + xl * sqrt(mt)) / (sqrt(mt) + sqrt(ml));
       
-
       t = 0.e0; // initialiser le temps
       y = y0;   // initialiser la position 
       last = 0; // initialise le parametre d'ecriture
