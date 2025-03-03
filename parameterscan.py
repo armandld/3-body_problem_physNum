@@ -12,16 +12,15 @@ os.chdir(repertoire)
 
 input_filename = 'configuration.in.example'  # Name of the input file
 
-alpha = np.array([0,0.5,1])
-nsteps = np.array([4000, 6000, 8e3,10000, 14e3, 2e4, 3e4, 5e4, 7e4,1e5])
-nsimul = len(nsteps)  # Number of simulations to perform
+#alpha = np.array([0,0.5,1])
+vy0 = -5.28 - np.geomspace(1e-2,1,5) # np.linspace(-6,-5,50)
+
+nsimul = len(vy0)  # Number of simulations to perform
 
 tfin = 259200  # TODO: Verify that the value of tfin is EXACTLY the same as in the input file
 
-dt = tfin / nsteps
-
-paramstr = 'alpha'  # Parameter name to scan
-param = nsteps  # Parameter values to scan
+paramstr = 'vy0'  # Parameter name to scan
+param = vy0  # Parameter values to scan
 
 # Simulations
 outputs = []  # List to store output file names
@@ -37,6 +36,27 @@ for i in range(nsimul):
     print('Done.')
 
 error = np.zeros(nsimul)
+
+lw = 1.5
+fs = 16
+
+fig, ax = plt.subplots(constrained_layout=True)
+plt.grid(True, linestyle="--", alpha=0.3)
+for i in range(nsimul):  # Iterate through the results of all simulations
+    data = np.loadtxt(outputs[i])  # Load the output file of the i-th simulation
+
+    dist_sl = np.sqrt((data[:,3]-3.80321e+08)**2 + data[:,4]**2)
+    t = data[:, 0]
+    #convergence_list.append(En)
+    # TODO compute the error for each simulation
+    #convergence_list = np.array(convergence_list)
+    ax.plot(t, dist_sl)
+ax.axhline(1737100)
+ax.set_xlabel('$t$ [s]', fontsize=fs)
+ax.set_ylabel('$d_{SL}$ [m]', fontsize=fs) 
+
+plt.show()
+"""
 '''
 fig, ax = plt.subplots(constrained_layout=True)
 plt.grid(True, linestyle="--", alpha=0.3)
@@ -112,13 +132,13 @@ plt.ylabel('final position x error [m]', fontsize=fs)
 plt.xticks(fontsize=fs)
 plt.yticks(fontsize=fs)
 plt.grid(True)
-
+"""
 """
 Si on n'a pas la solution analytique: on représente la quantite voulue
 (ci-dessous v_y, modifier selon vos besoins)
 en fonction de (Delta t)^norder, ou norder est un entier.
 """
-
+""" 
 #### PARTIE 2
 
 # Définition des paramètres
@@ -172,3 +192,4 @@ plt.xticks(fontsize=fs)
 plt.yticks(fontsize=fs)
 plt.grid(True, linestyle="--", alpha=0.3)
 plt.show()
+"""
