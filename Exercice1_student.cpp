@@ -52,8 +52,8 @@ double dist_s_l;     // Distance satellite-Lune
   {
   // TODO calculer l'energie mecanique
     double Energy =  0.5 * (y[0]*y[0] + y[1]*y[1]) // Énergie cinétique
-					- G_grav * mt / dist_s_t - G_grav * ml / dist_s_l // Énergie potentielle gravitationnelle
-					- 0.5 * Om * Om * (y[2]*y[2] + y[3]*y[3]); // Énergie potentielle centrifuge
+		     - G_grav * mt / dist_s_t - G_grav * ml / dist_s_l // Énergie potentielle gravitationnelle
+		     - 0.5 * Om * Om * (y[2]*y[2] + y[3]*y[3]); // Énergie potentielle centrifuge
 
     // Ecriture tous les [sampling] pas de temps, sauf si write est vrai
     if((!write && last>=sampling) || (write && last!=1))
@@ -89,7 +89,7 @@ double dist_s_l;     // Distance satellite-Lune
 	
     }
     
-	double dist_s(double x){ return sqrt(pow(y[2]-x,2)+pow(y[3],2));}
+    double dist_s(double x) const {return sqrt(pow(y[2]-x,2)+pow(y[3],2));}
 	
     // New step method from EngineEuler
     void step()
@@ -101,8 +101,8 @@ double dist_s_l;     // Distance satellite-Lune
       valarray<double> y_control=valarray<double>(y);
       valarray<double> delta_y_EE=valarray<double>(y);
 
-	  dist_s_l = dist_s(xl);
-	  dist_s_t = dist_s(xt);
+      dist_s_l = dist_s(xl);
+      dist_s_t = dist_s(xt);
 		
 
       //TODO : écrire un algorithme valide pour chaque alpha dans [0,1]
