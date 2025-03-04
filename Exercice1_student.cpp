@@ -89,7 +89,7 @@ double dist_s_l;     // Distance satellite-Lune
 	
     }
     
-	double dist_s(double x){ return sqrt(pow(y[2]-x,2)+pow(y[3],2));}
+    double dist_s(double x) const {return sqrt(pow(y[2]-x,2)+pow(y[3],2));}
 	
     // New step method from EngineEuler
     void step()
@@ -101,8 +101,8 @@ double dist_s_l;     // Distance satellite-Lune
       valarray<double> y_control=valarray<double>(y);
       valarray<double> delta_y_EE=valarray<double>(y);
 
-	  dist_s_l = dist_s(xl);
-	  dist_s_t = dist_s(xt);
+      dist_s_l = dist_s(xl);
+      dist_s_t = dist_s(xt);
 		
 
       //TODO : écrire un algorithme valide pour chaque alpha dans [0,1]
